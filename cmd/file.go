@@ -45,7 +45,7 @@ func init() {
 
 }
 
-func readYaml(args []string) interface{} {
+func readYaml(args []string) model.Kid {
 
 	if len(args) != 1 {
 		log.Fatal("Incorrect Number of Arguments")
@@ -65,5 +65,5 @@ func readYaml(args []string) interface{} {
 		log.Fatal(err2)
 	}
 
-	return (&kid)
+	return (kid)
 }
