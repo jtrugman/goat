@@ -8,7 +8,7 @@ import (
 )
 
 func TestReadYaml(t *testing.T) {
-	args := []string{"../example/testRead.yaml"}
+	args := []string{"../test_configs/testRead.yaml"}
 	got := readYaml(args)
 
 	want := model.Kid{}
