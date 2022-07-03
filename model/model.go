@@ -18,8 +18,8 @@ type Kid struct {
 			Jitter  float64 `yaml:"jitter"`
 		} `yaml:"command"`
 		Timer struct {
-			TimeValue int    `yaml:"timeValue"`
-			TimeUnit  string `yaml:"timeUnit"`
+			TimeValue float64 `yaml:"timeValue"`
+			TimeUnit  string  `yaml:"timeUnit"`
 		} `yaml:"timer"`
 		Link string `yaml:"link"`
 	} `yaml:"job"`
