@@ -1,0 +1,14 @@
+job:
+  command:
+    port: wlo1
+    operation: add
+    bitrate:
+      bitrateValue: 3.8
+      bitrateUnit: mbit
+    latency: 5.3
+    pktLoss: 0.5
+    jitter: 30.7
+  timer:
+    timeValue: 30.1
+    timeUnit: seconds
+  link: downlink
