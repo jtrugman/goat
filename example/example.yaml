@@ -3,7 +3,7 @@ job:
     port: wlo1
     operation: add
     bitrate:
-      bitrateValue: 3.8
+      bitrateValue: 5
       bitrateUnit: mbit
     latency: 5.3
     pktLoss: 0.5

@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -22,6 +23,17 @@ func TestReadYaml(t *testing.T) {
 	want.Job.Timer.TimeValue = 30.1
 	want.Job.Timer.TimeUnit = "seconds"
 	want.Job.Link = "downlink"
+
+	if cmp.Equal(got, want) == false {
+		t.Errorf("got %+v\n, wanted %+v\n", got, want)
+	}
+}
+
+func TestExecuteCommand(t *testing.T) {
+	testStr := []string{"goats"}
+	testProgram := "echo"
+	got := strings.TrimSuffix(executeCommand(testProgram, testStr), "\n")
+	want := "goats"
 
 	if cmp.Equal(got, want) == false {
 		t.Errorf("got %+v\n, wanted %+v\n", got, want)
