@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"os/exec"
 
 	"github.com/jtrugman/goat/model"
 	"github.com/spf13/cobra"
@@ -23,10 +24,11 @@ Example usage: goat file FILE_PATH
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("file called")
-
 		kid := readYaml(args)
-		fmt.Println(kid)
+
+		cmdProgram, cmdArray := executeTC(kid)
+
+		executeCommand(cmdProgram, cmdArray)
 	},
 }
 
@@ -66,4 +68,45 @@ func readYaml(args []string) model.Kid {
 	}
 
 	return (kid)
+}
+
+func executeTC(kid model.Kid) (string, []string) {
+
+	cmdArray := []string{"qdisc"}
+	cmdProgram := "tc"
+
+	switch kid.Job.Command.Operation {
+	case "delete":
+		cmdArray = append(cmdArray, kid.Job.Command.Operation, "dev", kid.Job.Command.Port, "root")
+		return cmdProgram, cmdArray
+	case "add", "change":
+		cmdArray = append(cmdArray, kid.Job.Command.Operation)
+	default:
+		log.Fatal("Operation not supported")
+	}
+
+	cmdArray = append(cmdArray, "dev", kid.Job.Command.Port, "root", "netem")
+
+	switch kid.Job.Command.Bitrate.BitrateUnit {
+	case "kbit", "mbit", "gbit":
+		cmdArray = append(cmdArray, "rate", fmt.Sprintf("%f", kid.Job.Command.Bitrate.BitrateValue)+kid.Job.Command.Bitrate.BitrateUnit)
+	default:
+		log.Fatal("Bitrate Unit not supported")
+	}
+
+	fmt.Print(cmdArray)
+
+	return cmdProgram, cmdArray
+
+}
+
+func executeCommand(cmdProgram string, cmdArray []string) string {
+	cmd := exec.Command(cmdProgram, cmdArray...)
+	output, err := cmd.CombinedOutput()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return string(output)
 }
