@@ -29,6 +29,23 @@ func TestReadYaml(t *testing.T) {
 	}
 }
 
+func TestExecuteTC(t *testing.T) {
+	testData := model.Kid{}
+	testData.Job.Command.Port = "wlo1"
+	testData.Job.Command.Operation = "add"
+	testData.Job.Command.Bitrate.BitrateValue = 3.8
+	testData.Job.Command.Bitrate.BitrateUnit = "mbit"
+
+	_, got := executeTC(testData)
+
+	want := []string{"qdisc", "add", "dev", "wlo1", "root", "netem", "rate", "3.800000mbit"}
+
+	if cmp.Equal(got, want) == false {
+		t.Errorf("got %+v\n, wanted %+v\n", got, want)
+	}
+
+}
+
 func TestExecuteCommand(t *testing.T) {
 	testStr := []string{"goats"}
 	testProgram := "echo"

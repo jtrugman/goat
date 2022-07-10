@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"os"
 	"os/exec"
 
 	"github.com/jtrugman/goat/model"
@@ -27,7 +26,9 @@ Example usage: goat file FILE_PATH
 	Run: func(cmd *cobra.Command, args []string) {
 		kid := readYaml(args)
 
-		executeTC(kid)
+		cmdProgram, cmdArray := executeTC(kid)
+
+		executeCommand(cmdProgram, cmdArray)
 	},
 }
 
@@ -69,7 +70,7 @@ func readYaml(args []string) model.Kid {
 	return (kid)
 }
 
-func executeTC(kid model.Kid) {
+func executeTC(kid model.Kid) (string, []string) {
 
 	cmdArray := []string{"qdisc"}
 	cmdProgram := "tc"
@@ -77,8 +78,7 @@ func executeTC(kid model.Kid) {
 	switch kid.Job.Command.Operation {
 	case "delete":
 		cmdArray = append(cmdArray, kid.Job.Command.Operation, "dev", kid.Job.Command.Port, "root")
-		executeCommand(cmdProgram, cmdArray)
-		os.Exit(0)
+		return cmdProgram, cmdArray
 	case "add", "change":
 		cmdArray = append(cmdArray, kid.Job.Command.Operation)
 	default:
@@ -96,7 +96,7 @@ func executeTC(kid model.Kid) {
 
 	fmt.Print(cmdArray)
 
-	executeCommand(cmdProgram, cmdArray)
+	return cmdProgram, cmdArray
 
 }
 
