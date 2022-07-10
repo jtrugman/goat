@@ -29,7 +29,7 @@ func TestReadYaml(t *testing.T) {
 	}
 }
 
-func TestExecuteTC(t *testing.T) {
+func TestExecuteTCAddChange(t *testing.T) {
 	testData := model.Kid{}
 	testData.Job.Command.Port = "wlo1"
 	testData.Job.Command.Operation = "add"
@@ -43,7 +43,20 @@ func TestExecuteTC(t *testing.T) {
 	if cmp.Equal(got, want) == false {
 		t.Errorf("got %+v\n, wanted %+v\n", got, want)
 	}
+}
 
+func TestExecuteTCDelete(t *testing.T) {
+	testData := model.Kid{}
+	testData.Job.Command.Port = "wlo1"
+	testData.Job.Command.Operation = "delete"
+
+	_, got := executeTC(testData)
+
+	want := []string{"qdisc", "delete", "dev", "wlo1", "root"}
+
+	if cmp.Equal(got, want) == false {
+		t.Errorf("got %+v\n, wanted %+v\n", got, want)
+	}
 }
 
 func TestExecuteCommand(t *testing.T) {
