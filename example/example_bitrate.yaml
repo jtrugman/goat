@@ -1,0 +1,7 @@
+job:
+  command:
+    port: wlo1
+    operation: delete
+    bitrate:
+      bitrateValue: 5
+      bitrateUnit: mbit

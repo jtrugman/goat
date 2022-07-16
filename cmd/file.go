@@ -24,7 +24,11 @@ Example usage: goat file FILE_PATH
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		kid := readYaml(args)
+		kid, err := readYaml(args)
+
+		if err != nil {
+			log.Fatal(err)
+		}
 
 		cmdProgram, cmdArray := executeTC(kid)
 
@@ -47,31 +51,32 @@ func init() {
 
 }
 
-func readYaml(args []string) model.Kid {
+func readYaml(args []string) (model.Kid, error) {
 
 	if len(args) != 1 {
-		log.Fatal("Incorrect Number of Arguments")
+		err := fmt.Errorf("incorrect number of arguments")
+		return model.Kid{}, err
 	}
 
 	yfile, err := ioutil.ReadFile(args[0])
 
 	if err != nil {
-		log.Fatal(err)
+		return model.Kid{}, err
 	}
 
 	var kid model.Kid
 
 	err2 := yaml.Unmarshal(yfile, &kid)
 
-	if err != nil {
-		log.Fatal(err2)
+	if err2 != nil {
+		return model.Kid{}, err2
 	}
 
-	return (kid)
+	return (kid), err
 }
 
 func executeTC(kid model.Kid) (string, []string) {
-
+	// TODO: Change log.fatal to return error string
 	cmdArray := []string{"qdisc"}
 	cmdProgram := "tc"
 
@@ -87,14 +92,35 @@ func executeTC(kid model.Kid) (string, []string) {
 
 	cmdArray = append(cmdArray, "dev", kid.Job.Command.Port, "root", "netem")
 
-	switch kid.Job.Command.Bitrate.BitrateUnit {
-	case "kbit", "mbit", "gbit":
-		cmdArray = append(cmdArray, "rate", fmt.Sprintf("%f", kid.Job.Command.Bitrate.BitrateValue)+kid.Job.Command.Bitrate.BitrateUnit)
-	default:
-		log.Fatal("Bitrate Unit not supported")
+	if len(kid.Job.Command.Bitrate.BitrateUnit) > 0 {
+		// TODO: Clean up nested if statement
+		switch kid.Job.Command.Bitrate.BitrateUnit {
+		case "kbit", "mbit", "gbit":
+			cmdArray = append(cmdArray, "rate", fmt.Sprintf("%f", kid.Job.Command.Bitrate.BitrateValue)+kid.Job.Command.Bitrate.BitrateUnit)
+
+		default:
+			log.Fatal("Bitrate Unit not supported")
+		}
 	}
 
-	fmt.Print(cmdArray)
+	if kid.Job.Command.PktLoss != 0 {
+		// TODO: Clean up nested if statement
+		switch kid.Job.Command.PktLoss {
+		case kid.Job.Command.PktLoss:
+			cmdArray = append(cmdArray, "loss", fmt.Sprintf("%f", kid.Job.Command.PktLoss)+"%")
+		default:
+			log.Fatal("Incorrect PKT Loss type")
+		}
+	}
+
+	if kid.Job.Command.Latency != 0 {
+		cmdArray = append(cmdArray, "delay", fmt.Sprintf("%f", kid.Job.Command.Latency))
+		if kid.Job.Command.Jitter != 0 {
+			cmdArray = append(cmdArray, fmt.Sprintf("%f", kid.Job.Command.Jitter))
+		}
+	}
+
+	fmt.Print(cmdProgram, cmdArray)
 
 	return cmdProgram, cmdArray
 

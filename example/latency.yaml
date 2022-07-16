@@ -1,0 +1,5 @@
+job:
+  command:
+    port: wlo1
+    operation: add
+    latency: 50
