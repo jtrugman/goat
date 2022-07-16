@@ -1,0 +1,6 @@
+job:
+  command:
+    port: wlo1
+    operation: add
+    latency: 50.2
+    jitter: 30.7
