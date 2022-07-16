@@ -24,7 +24,11 @@ Example usage: goat file FILE_PATH
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		kid := readYaml(args)
+		kid, err := readYaml(args)
+
+		if err != nil {
+			log.Fatal(err)
+		}
 
 		cmdProgram, cmdArray := executeTC(kid)
 
@@ -47,27 +51,28 @@ func init() {
 
 }
 
-func readYaml(args []string) model.Kid {
+func readYaml(args []string) (model.Kid, error) {
 
 	if len(args) != 1 {
-		log.Fatal("Incorrect Number of Arguments")
+		err := fmt.Errorf("incorrect number of arguments")
+		return model.Kid{}, err
 	}
 
 	yfile, err := ioutil.ReadFile(args[0])
 
 	if err != nil {
-		log.Fatal(err)
+		return model.Kid{}, err
 	}
 
 	var kid model.Kid
 
 	err2 := yaml.Unmarshal(yfile, &kid)
 
-	if err != nil {
-		log.Fatal(err2)
+	if err2 != nil {
+		return model.Kid{}, err2
 	}
 
-	return (kid)
+	return (kid), err
 }
 
 func executeTC(kid model.Kid) (string, []string) {

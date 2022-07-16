@@ -10,7 +10,7 @@ import (
 
 func TestReadYaml(t *testing.T) {
 	args := []string{"../test_configs/testRead.yaml"}
-	got := readYaml(args)
+	got, _ := readYaml(args)
 
 	want := model.Kid{}
 	want.Job.Command.Port = "wlo1"
