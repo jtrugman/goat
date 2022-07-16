@@ -29,7 +29,7 @@ func TestReadYaml(t *testing.T) {
 	}
 }
 
-func TestExecuteTCAddChange(t *testing.T) {
+func TestExecuteTCAddChangeBitrate(t *testing.T) {
 	testData := model.Kid{}
 	testData.Job.Command.Port = "wlo1"
 	testData.Job.Command.Operation = "add"
@@ -53,6 +53,52 @@ func TestExecuteTCDelete(t *testing.T) {
 	_, got := executeTC(testData)
 
 	want := []string{"qdisc", "delete", "dev", "wlo1", "root"}
+
+	if cmp.Equal(got, want) == false {
+		t.Errorf("got %+v\n, wanted %+v\n", got, want)
+	}
+}
+
+func TestExecuteTCAddChangePktLoss(t *testing.T) {
+	testData := model.Kid{}
+	testData.Job.Command.Port = "wlo1"
+	testData.Job.Command.Operation = "add"
+	testData.Job.Command.PktLoss = 10.0
+
+	_, got := executeTC(testData)
+
+	want := []string{"qdisc", "add", "dev", "wlo1", "root", "netem", "loss", "10.000000%"}
+
+	if cmp.Equal(got, want) == false {
+		t.Errorf("got %+v\n, wanted %+v\n", got, want)
+	}
+}
+
+func TestExecuteTCAddChangeLatency(t *testing.T) {
+	testData := model.Kid{}
+	testData.Job.Command.Port = "wlo1"
+	testData.Job.Command.Operation = "add"
+	testData.Job.Command.Latency = 10.0
+
+	_, got := executeTC(testData)
+
+	want := []string{"qdisc", "add", "dev", "wlo1", "root", "netem", "delay", "10.000000"}
+
+	if cmp.Equal(got, want) == false {
+		t.Errorf("got %+v\n, wanted %+v\n", got, want)
+	}
+}
+
+func TestExecuteTCAddChangeJitter(t *testing.T) {
+	testData := model.Kid{}
+	testData.Job.Command.Port = "wlo1"
+	testData.Job.Command.Operation = "add"
+	testData.Job.Command.Latency = 10.0
+	testData.Job.Command.Jitter = 20.0
+
+	_, got := executeTC(testData)
+
+	want := []string{"qdisc", "add", "dev", "wlo1", "root", "netem", "delay", "10.000000", "20.000000"}
 
 	if cmp.Equal(got, want) == false {
 		t.Errorf("got %+v\n, wanted %+v\n", got, want)
